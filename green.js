@@ -21,6 +21,18 @@ commands.greentop = function(nick, to, args, message) {
   rank("greentext", "Most greentext", to);
 };
 
+commands.greenpct = function(nick, to, args, message) {
+  var who = args.length ? args[0] : nick;
+  redis_client.hget("greentext", who, function(error, reply) {
+    var green = +reply;
+    redis_client.hget("lines", who, function(error, reply) {
+      var lines = +reply;
+      var pct = (100 * green / lines).toPrecision(3);
+      client.say(to, who + "'s percentage of greentext: " + pct + "%");
+    });
+  });
+};
+
 commands.reload = function(nick, to, args, message) {
   delete require.cache[require.resolve('./green')];
   var obj = require('./green')(client, redis_client, reloader);
