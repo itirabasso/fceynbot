@@ -24,10 +24,6 @@ delayer.delay(function() {
   commands.greenpct = utils.makePercent("greentext", "lines", "percentage of greentext");
 });
 
-/*function(nick, to, args, message) {
-  rank("greentext", "Most greentext", to);
-};*/
-
 commands.reload = function(nick, to, args, message) {
   delete require.cache[require.resolve('./green')];
   var obj = require('./green')(client, redis_client, reloader);

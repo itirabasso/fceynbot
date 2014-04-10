@@ -162,22 +162,6 @@ function rank(source, prefix, to) {
   });
 }
 
-/*commands.top = function(nick, to, args, message) {
-  rank("lines", "Top writers", to);
-};
-
-commands.rank = function(nick, to, args, message) {
-  rank("karma", "Most karma", to);
-};
-
-commands.greentop = function(nick, to, args, message) {
-  rank("greentext", "Most greentext", to);
-};
-
-commands.rankis = function(nick, to, args, message) {
-  rank("is", "Most -is", to);
-};*/
-
 delayer.delay(function() {
   commands.top = utils.makeRank("lines", "Top writers");
   commands.rank = utils.makeRank("karma", "Most karma");
