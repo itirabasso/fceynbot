@@ -28,11 +28,18 @@ hooks.url = function(nick, to, text) {
       if (error) return console.log(error);
       var title = body.match(titleregex);
       if (title) {
-        title = S(title[1]).decodeHTMLEntities().s.trim();
+        title = S(title[1]).decodeHTMLEntities().s.trim().replace(/[\n\r]/g, "");
         client.say(to, "Title: " + title);
       }
     });
   }
+};
+
+hooks.is = function(nick, to, text) {
+  var words = text.split(" ").filter(function(w) {
+    return w.length >= 3 && w.substr(-2) == "is";
+  }).length;
+  redis_client.hincrby("is", nick, words);
 };
 
 module.exports = function(client_, redis_client_) {

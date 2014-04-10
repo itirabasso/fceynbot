@@ -1,6 +1,8 @@
 var redis_client,
     client,
-    reloader;
+    reloader,
+    utils,
+    delayer = new (require('./delayer').Delayer);
 
 var commands = {};
 
@@ -17,21 +19,14 @@ function rank(source, prefix, to) {
   });
 }
 
-commands.greentop = function(nick, to, args, message) {
-  rank("greentext", "Most greentext", to);
-};
+delayer.delay(function() {
+  commands.greentop = utils.makeRank("greentext", "Most greentext");
+  commands.greenpct = utils.makePercent("greentext", "lines", "percentage of greentext");
+});
 
-commands.greenpct = function(nick, to, args, message) {
-  var who = args.length ? args[0] : nick;
-  redis_client.hget("greentext", who, function(error, reply) {
-    var green = +reply;
-    redis_client.hget("lines", who, function(error, reply) {
-      var lines = +reply;
-      var pct = (100 * green / lines).toPrecision(3);
-      client.say(to, who + "'s percentage of greentext: " + pct + "%");
-    });
-  });
-};
+/*function(nick, to, args, message) {
+  rank("greentext", "Most greentext", to);
+};*/
 
 commands.reload = function(nick, to, args, message) {
   delete require.cache[require.resolve('./green')];
@@ -42,6 +37,8 @@ commands.reload = function(nick, to, args, message) {
 module.exports = function(client_, redis_client_, reloader_) {
   client = client_;
   redis_client = redis_client_;
+  utils = require('./utils')(client, redis_client);
+  delayer.run();
   reloader = reloader_;
   return commands;
 };

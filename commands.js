@@ -1,6 +1,8 @@
 var request = require('request'),
     S       = require('string'),
-    moment  = require('moment');
+    moment  = require('moment'),
+    delayer = new (require('./delayer').Delayer),
+    utils;
 
 var redis_client,
     client,
@@ -139,6 +141,14 @@ commands.avglen = function(nick, to, args, message) {
  });
 };
 
+commands.wc = function(nick, to, args, message) {
+  var who = args.length ? args[0] : nick;
+  redis_client.hget("words", who, function(error, reply) {
+    var count = +reply;
+    client.say(to, who + " has written " + count + " words.");
+  });
+};
+
 function rank(source, prefix, to) {
   redis_client.hgetall(source, function(error, reply) {
     var users = Object.keys(reply);
@@ -152,7 +162,7 @@ function rank(source, prefix, to) {
   });
 }
 
-commands.top = function(nick, to, args, message) {
+/*commands.top = function(nick, to, args, message) {
   rank("lines", "Top writers", to);
 };
 
@@ -163,6 +173,17 @@ commands.rank = function(nick, to, args, message) {
 commands.greentop = function(nick, to, args, message) {
   rank("greentext", "Most greentext", to);
 };
+
+commands.rankis = function(nick, to, args, message) {
+  rank("is", "Most -is", to);
+};*/
+
+delayer.delay(function() {
+  commands.top = utils.makeRank("lines", "Top writers");
+  commands.rank = utils.makeRank("karma", "Most karma");
+  commands.rankis = utils.makeRank("is", "Most -is");
+  commands.percentis = utils.makePercent("is", "words", "percentage of -is terminated words");
+});
 
 commands.wiki = function(nick, to, args, message) {
   if (!args.length) return;
@@ -248,6 +269,8 @@ module.exports = function(client_, redis_client_, reloader_, hookreloader_) {
   redis_client = redis_client_;
   reloader = reloader_;
   hookreloader = hookreloader_;
+  utils = require('./utils')(client, redis_client);
+  delayer.run();
   return commands;
 };
 
