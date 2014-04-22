@@ -238,7 +238,7 @@ commands.nick = function(nick, to, args, message) {
 
 commands.reload = function() {
   delete require.cache[require.resolve('./commands')];
-  var obj = require('./commands')(client, redis_client, reloader);
+  var obj = require('./commands')(client, redis_client, reloader, hookreloader);
   reloader(obj);
 };
 
