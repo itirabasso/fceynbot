@@ -248,6 +248,10 @@ commands.hookreload = function() {
   hookreloader(obj);
 };
 
+commands.help = function(nick, to, args, message) {
+  client.say(to, "Commands: " + Object.keys(commands).map(function(k) { return '!' + k; }).join(', '));
+};
+
 module.exports = function(client_, redis_client_, reloader_, hookreloader_) {
   client = client_;
   redis_client = redis_client_;
