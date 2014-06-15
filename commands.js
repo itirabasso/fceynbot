@@ -261,7 +261,7 @@ function cleanupCorpus(text){
               // No emails
               .filter(function(s){ return s.indexOf("@") === -1; })
               .map(function(s){
-                  return s.replace(/[._,;:(){}\[\]-]/g, ''); 
+                  return s.replace(/[._,;:(){}\[\]-]/g, '');
               })
               .filter(function(s){ return s.length > 0; })
               .map(function(s){ return s.toLowerCase(); });
@@ -309,7 +309,7 @@ commands.fvicent = (function(){
   var loaded = false;
   return function(nick, to, args, message) {
     var maxWords = 20;
-    var words = (args.length >= 1) ? 
+    var words = (args.length >= 1) ?
         parseInt(args[0], 10) : maxWords;
     if(isNaN(words) || words <= 0 || words > maxWords){
       return false;
@@ -325,7 +325,7 @@ commands.fvicent = (function(){
       }
     } catch (e) {
       console.log(e);
-      client.say(to,"Could not read vicentini's texts"); 
+      client.say(to,"Could not read vicentini's texts");
       return false;
     }
   }
