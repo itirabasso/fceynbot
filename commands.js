@@ -175,7 +175,7 @@ commands.wiki = function(nick, to, args, message) {
   var what = args.join(' ');
   var wikiurl = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&redirects&titles=",
       wikiprefix = "http://en.wikipedia.org/wiki/";
-  request(wikiurl + encodeURIComponent(what), function(error, response, body) {
+  request(wikiurl + what, function(error, response, body) {
     if (error) return console.log(error);
     var json = JSON.parse(body),
         pages = json.query.pages;
@@ -213,6 +213,7 @@ commands.join = function(nick, to, args, message) {
 };
 
 commands.js = function(nick, to, args, message) {
+  //if (nick != "flebron") return;
   var code = args.join(' ');
   console.log("Evaluating " + code);
   sandbox.run(code, function(output) {
