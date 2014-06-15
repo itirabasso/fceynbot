@@ -2,16 +2,15 @@ var request = require('request');
 var S = require('string');
 var irc = require('irc');
 var redis = require("redis"),
-            redis_client = redis.createClient();
+    redis_client = redis.createClient();
 
 var client = new irc.Client('irc.freenode.net', 'ElBuenSPJ', {
   channels: ["#hidden_weird_channel"],
   userName: "ElBuenSPJ",
   realName: "ElBuenSPJ",
   nick: "ElBuenSPJ",
-  flodProtection: true,
+  floodProtection: true,
 });
-
 
 var commands, green, hooks;
 var reloader = function(obj) {

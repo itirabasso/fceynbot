@@ -1,6 +1,7 @@
 var request = require('request'),
     S       = require('string'),
     moment  = require('moment'),
+    _ = require("underscore"),
     delayer = new (require('./delayer').Delayer),
     utils;
 
@@ -251,6 +252,79 @@ commands.hookreload = function() {
 commands.help = function(nick, to, args, message) {
   client.say(to, "Commands: " + Object.keys(commands).map(function(k) { return '!' + k; }).join(', '));
 };
+
+function cleanupCorpus(text){
+  var reg = /^http:\/\/.*$/ig;
+  return  text.trim().split(/\s+/)
+              .map(function(s){ return s.trim(); })
+              // No urls
+              .filter(function(s){ return s.match(reg) === null; })
+              // No emails
+              .filter(function(s){ return s.indexOf("@") === -1; })
+              .map(function(s){
+                  return s.replace(/[._,;:(){}\[\]-]/g, '');
+              })
+              .filter(function(s){ return s.length > 0; })
+              .map(function(s){ return s.toLowerCase(); });
+}
+
+function initTextCorpusDb(callback) {
+  // assets/vicentini.txt should contain a text corpus of email.
+  return fs.readFile("assets/vicentini.txt","utf8",function(err,data){
+    if(err) throw err;
+    var words = cleanupCorpus(data);
+    var multi = redis_client.multi();
+    for(var i = 0; i+1 < words.length; ++i){
+        var curr = words[i], next = words[i+1];
+        multi.sadd("fvicent:"+curr, next);
+    }
+    multi.exec(function(err, result){
+        if(err) throw err;
+        callback();
+    });
+  });
+}
+
+function buildSentence(word,length,str,callback){
+  if(length === 0){
+    return callback(str);
+  }
+  return redis_client.srandmember("fvicent:"+word, function(error, nextWord){
+    nextWord = nextWord || "mafia";
+    return buildSentence(nextWord,length-1,str+" "+nextWord,callback);
+  });
+}
+
+function randomCorpusSentence(to, length) {
+  // 2 word markov chain algorithm
+  return redis_client.keys("fvicent:*",function(error, replies){
+    if(replies.length == 0){
+      return client.say(to, "Corpus has not been loaded");
+    }
+    var startWord = _.sample(replies).substr("fvicent:".length);
+    var t = to;
+    return buildSentence(startWord,length-1,startWord,function(str){
+        return client.say(t, ">" + str);
+    });
+  });
+}
+
+commands.reloadcorpus = function(nick, to, args, message) {
+  if (nick != "flebron") return;
+  return initTextCorpusDb(function(){
+    client.say(to,"Corpus loaded!");
+  });
+}
+
+commands.fvicent = function(nick, to, args, message) {
+  var maxWords = 50;
+  var words = (args.length >= 1) ?
+      parseInt(args[0], 10) : 20;
+  if(isNaN(words) || words <= 0 || words > maxWords){
+    return false;
+  }
+  return randomCorpusSentence(to,words);
+}
 
 module.exports = function(client_, redis_client_, reloader_, hookreloader_) {
   client = client_;
