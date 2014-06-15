@@ -297,39 +297,33 @@ function buildSentence(word,length,str,callback){
 function randomCorpusSentence(to, length) {
   // 2 word markov chain algorithm
   return redis_client.keys("fvicent:*",function(error, replies){
-     var startWord = _.sample(replies).substr("fvicent:".length);
-     var t = to;
-     return buildSentence(startWord,length,startWord,function(str){
-         return client.say(t, ">" + str);
-     });
+    if(replies.length == 0){
+      return client.say(to, "Corpus has not been loaded");
+    }
+    var startWord = _.sample(replies).substr("fvicent:".length);
+    var t = to;
+    return buildSentence(startWord,length-1,startWord,function(str){
+        return client.say(t, ">" + str);
+    });
   });
 }
 
-commands.fvicent = (function(){
-  var loaded = false;
-  return function(nick, to, args, message) {
-    var maxWords = 20;
-    var words = (args.length >= 1) ?
-        parseInt(args[0], 10) : maxWords;
-    if(isNaN(words) || words <= 0 || words > maxWords){
-      return false;
-    }
-    try{
-      if(!loaded){
-        return initTextCorpusDb(function(){
-          randomCorpusSentence(to,words);
-          loaded = true;
-        });
-      }else{
-        return randomCorpusSentence(to,words);
-      }
-    } catch (e) {
-      console.log(e);
-      client.say(to,"Could not read vicentini's texts");
-      return false;
-    }
+commands.reloadcorpus = function(nick, to, args, message) {
+  if (nick != "flebron") return;
+  return initTextCorpusDb(function(){
+    client.say(to,"Corpus loaded!");
+  });
+}
+
+commands.fvicent = function(nick, to, args, message) {
+  var maxWords = 50;
+  var words = (args.length >= 1) ?
+      parseInt(args[0], 10) : 20;
+  if(isNaN(words) || words <= 0 || words > maxWords){
+    return false;
   }
-}());
+  return randomCorpusSentence(to,words);
+}
 
 module.exports = function(client_, redis_client_, reloader_, hookreloader_) {
   client = client_;
