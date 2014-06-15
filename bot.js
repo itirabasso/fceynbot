@@ -4,11 +4,11 @@ var irc = require('irc');
 var redis = require("redis"),
     redis_client = redis.createClient();
 
-var client = new irc.Client('irc.freenode.net', 'ElBuenJWZ', {
+var client = new irc.Client('irc.freenode.net', 'ElBuenSPJ', {
   channels: ["#hidden_weird_channel"],
-  userName: "ElBuenJWZ",
-  realName: "ElBuenJWZ",
-  nick: "ElBuenJWZ",
+  userName: "ElBuenSPJ",
+  realName: "ElBuenSPJ",
+  nick: "ElBuenSPJ",
   floodProtection: true,
 });
 
