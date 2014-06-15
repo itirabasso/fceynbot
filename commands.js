@@ -199,14 +199,14 @@ commands.wiki = function(nick, to, args, message) {
 };
 
 commands.say = function(nick, to, args, message) {
-  if(nick != "flebron") return;
+  if (nick != "flebron") return;
   var channel = args[0],
       text = args.slice(1).join(' ');
   client.say(channel, text);
 };
 
 commands.join = function(nick, to, args, message) {
-  if(nick != "flebron") return;
+  if (nick != "flebron") return;
   if (!args.length) return;
   var channel = args[0];
   client.join(channel);
@@ -231,7 +231,7 @@ commands.js = function(nick, to, args, message) {
 };
 
 commands.nick = function(nick, to, args, message) {
-  if(nick != "flebron") return;
+  if (nick != "flebron") return;
   var newnick = args[0];
   client.send("NICK", newnick);
 };
@@ -260,7 +260,7 @@ function cleanupCorpus(text){
               .filter(function(s){ return s.match(reg) === null; })
               // No emails
               .filter(function(s){ return s.indexOf("@") === -1; })
-              .map(function(s){ 
+              .map(function(s){
                   return s.replace(/[._,;:(){}\[\]-]/g, ''); 
               })
               .filter(function(s){ return s.length > 0; })
