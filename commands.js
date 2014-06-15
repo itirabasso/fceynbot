@@ -173,7 +173,7 @@ delayer.delay(function() {
 
 commands.wiki = function(nick, to, args, message) {
   if (!args.length) return;
-  var what = args.join(' ');
+  var what = encodeURIComponent(args.join(' '));
   var wikiurl = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&redirects&titles=",
       wikiprefix = "http://en.wikipedia.org/wiki/";
   request(wikiurl + what, function(error, response, body) {
