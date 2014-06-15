@@ -1,6 +1,7 @@
 var request = require('request'),
     S       = require('string'),
     moment  = require('moment'),
+    fs      = require('fs'),
     _ = require("underscore"),
     delayer = new (require('./delayer').Delayer),
     utils;
