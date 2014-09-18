@@ -4,11 +4,11 @@ var irc = require('irc');
 var redis = require("redis"),
     redis_client = redis.createClient();
 
-var client = new irc.Client('irc.freenode.net', 'ElBuenSPJ', {
-  channels: ["#hidden_weird_channel"],
-  userName: "ElBuenSPJ",
-  realName: "ElBuenSPJ",
-  nick: "ElBuenSPJ",
+var client = new irc.Client('irc.freenode.net', 'Furfaro', {
+  channels: ["#orga2test"],
+  userName: "Furfi",
+  realName: "Furfaro",
+  nick: "Furfaro",
   floodProtection: true,
 });
 
@@ -40,16 +40,13 @@ client.addListener('message', function(nick, to, text, message) {
   redis_client.hincrby("total_length", nick, text.length);
   redis_client.incr("total_lines");
   var cmd, cmds, args;
-  if (text[0] == '>') {
-    redis_client.hincrby("greentext", nick, 1);
-  }
-  if (text[0] == '!' || text[0] == '>') {
+  if (text[0] == '!') {
     args = text.trim().substr(1).split(' ').map(function(x) {
       return x.trim();
     });
     cmd = args[0];
     args.shift();
-    cmds = text[0] == '!' ? commands : green;
+    cmds = commands;
     if (cmd in cmds) {
       return cmds[cmd](nick, to, args, message);
     }
