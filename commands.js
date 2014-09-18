@@ -7,9 +7,15 @@ var request = require('request'),
     utils
     instructions = require('./instructions');
 
+var quiet = false;
+
 var redis_client,
     client,
     reloader;
+
+
+var piolas = ['charco', 'charc0', 'noit', 'lpwaterhouse'];
+
 
 var EVALUATION_TIMEOUT_MSEC = 1000,
     Sandbox = require('sandbox'),
@@ -100,8 +106,9 @@ commands.lastquote = function(nick, to, args, message) {
   });
 };
 
-commands.ud = function(nick, to, args, message) {
+commands.define = function(nick, to, args, message) {
   if (!args.length) return;
+  if (!quiet) return;
   var udurl = "http://api.urbandictionary.com/v0/define?term=";
   var what = args.join(' ');
   request(udurl + what, function(error, response, body) {
@@ -199,21 +206,21 @@ commands.wiki = function(nick, to, args, message) {
 };
 
 commands.say = function(nick, to, args, message) {
-  if (nick != "flebron") return;
+  if (nick != "lpwaterhouse") return;
   var channel = args[0],
       text = args.slice(1).join(' ');
   client.say(channel, text);
 };
 
 commands.join = function(nick, to, args, message) {
-  if (nick != "flebron") return;
+  if (nick != "lpwaterhouse") return;
   if (!args.length) return;
   var channel = args[0];
   client.join(channel);
 };
 
 commands.js = function(nick, to, args, message) {
-  //if (nick != "flebron") return;
+  if (nick != "lpwaterhouse") return;
   var code = args.join(' ');
   console.log("Evaluating " + code);
   sandbox.run(code, function(output) {
@@ -232,7 +239,7 @@ commands.js = function(nick, to, args, message) {
 };
 
 commands.nick = function(nick, to, args, message) {
-  if (nick != "flebron") return;
+  if (nick != "lpwaterhouse") return;
   var newnick = args[0];
   client.send("NICK", newnick);
 };
@@ -265,6 +272,14 @@ commands.asm = function(nick, to, args, message) {
 
   client.say(to, msg);
 }
+
+commands.quiet = function(nick, to, args, message) {
+  if (!_.contains(piolas, nick)) return;
+  quiet = !quiet;
+  console.log(quiet ? "Quiet." : "Not quiet.");
+  client.say(nick, quiet ? "Quiet." : "Not quiet.");
+}
+
 
 commands.hookreload = function() {
   delete require.cache[require.resolve('./hooks')];
