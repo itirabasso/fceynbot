@@ -26,7 +26,6 @@ var hookreloader = function(obj) {
 };
 
 commands = require('./commands')(client, redis_client, reloader, hookreloader);
-green = require('./green')(client, redis_client, greenreloader);
 hooks = require('./hooks')(client, redis_client);
 
 client.addListener('message', function(nick, to, text, message) {

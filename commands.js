@@ -4,7 +4,8 @@ var request = require('request'),
     fs      = require('fs'),
     _ = require("underscore"),
     delayer = new (require('./delayer').Delayer),
-    utils;
+    utils
+    instructions = require('./instructions');
 
 var redis_client,
     client,
@@ -241,6 +242,29 @@ commands.reload = function() {
   var obj = require('./commands')(client, redis_client, reloader, hookreloader);
   reloader(obj);
 };
+
+function getInstructionMsg(name) {
+  name = name.toUpperCase();
+  var msg = 'No pude encontrar la instrucción, revisá el manual: http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-instruction-set-reference-manual-325383.pdf';
+  if (name in instructions.instructions) {
+
+    var instr = instructions.instructions[name];
+    console.log(instr);
+
+    msg = instr.name + ': ' + instr.description;
+    msg += '. Para más información click acá: ' + instr.url;
+  }
+
+  return msg;
+}
+
+commands.asm = function(nick, to, args, message) {
+  if (args.length <= 0) return false;
+
+  var msg = getInstructionMsg(args[0]);
+
+  client.say(to, msg);
+}
 
 commands.hookreload = function() {
   delete require.cache[require.resolve('./hooks')];
