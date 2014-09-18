@@ -108,7 +108,7 @@ commands.lastquote = function(nick, to, args, message) {
 
 commands.define = function(nick, to, args, message) {
   if (!args.length) return;
-  if (!quiet) return;
+  if (quiet) return;
   var udurl = "http://api.urbandictionary.com/v0/define?term=";
   var what = args.join(' ');
   request(udurl + what, function(error, response, body) {
@@ -267,6 +267,7 @@ function getInstructionMsg(name) {
 
 commands.asm = function(nick, to, args, message) {
   if (args.length <= 0) return false;
+  if (quiet) return;
 
   var msg = getInstructionMsg(args[0]);
 
@@ -277,7 +278,7 @@ commands.quiet = function(nick, to, args, message) {
   if (!_.contains(piolas, nick)) return;
   quiet = !quiet;
   console.log(quiet ? "Quiet." : "Not quiet.");
-  client.say(nick, quiet ? "Quiet." : "Not quiet.");
+  // client.say(nick, quiet ? "Quiet." : "Not quiet.");
 }
 
 
