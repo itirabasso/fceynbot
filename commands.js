@@ -108,6 +108,7 @@ commands.lastquote = function(nick, to, args, message) {
 
 commands.define = function(nick, to, args, message) {
   if (!args.length) return;
+  if (nick == "Rozen") return;
   if (quiet) return;
   var udurl = "http://api.urbandictionary.com/v0/define?term=";
   var what = args.join(' ');
@@ -118,7 +119,11 @@ commands.define = function(nick, to, args, message) {
       client.say(to, "No definition found.");
     } else {
       var definition = json.list[0].definition;
-      client.say(to, what + ": " + definition);
+      if (definition.length > 420) {
+	client.say(to, "Too large, sorry.");
+	return;
+      }
+    client.say(to, what + ": " + definition);
     }
   });
 };
@@ -158,6 +163,11 @@ commands.wc = function(nick, to, args, message) {
     client.say(to, who + " has written " + count + " words.");
   });
 };
+
+/*commands.rozen = function(nick, to, args, message) {
+    client.say(to, "rozen gato.");
+};*/
+
 
 function rank(source, prefix, to) {
   redis_client.hgetall(source, function(error, reply) {
@@ -279,6 +289,16 @@ commands.quiet = function(nick, to, args, message) {
   quiet = !quiet;
   console.log(quiet ? "Quiet." : "Not quiet.");
   // client.say(nick, quiet ? "Quiet." : "Not quiet.");
+}
+
+commands.triforce = function(nick, to, args, message) {
+  if (nick != "lpwaterhouse") return;
+
+  var space = String.fromCharCode(160); // a0
+  var force = String.fromCharCode(9650); // 25b2
+  var enter = String.fromCharCode(10); // 0a
+  var channel = args.length ? args[0] : to;
+  client.say(channel, space + force + enter + force + space + force);
 }
 
 
