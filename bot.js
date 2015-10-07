@@ -4,6 +4,10 @@ var irc = require('irc');
 var redis = require("redis"),
     redis_client = redis.createClient();
 
+if (!Date.now) {
+    Date.now = function() { return new Date().getTime(); }
+
+}
 var client = new irc.Client('irc.freenode.net', 'Furfaro', {
   channels: ["#orga2test"],
   userName: "Furfi",
@@ -35,6 +39,8 @@ client.addListener('message', function(nick, to, text, message) {
     "channel": to == client.opt.nick ? "private message" : to
   }));
 
+  storeMessage(nick, text);
+
   redis_client.hincrby("lines", nick, 1);
   redis_client.hincrby("total_length", nick, text.length);
   redis_client.incr("total_lines");
@@ -55,6 +61,16 @@ client.addListener('message', function(nick, to, text, message) {
     hooks[hook](nick, to, text);
   }
 });
+
+function storeMessage(from, msg) {
+  id = redis_client.incr('message_id');
+  entry = {
+    'time': Date.now(),
+    'from': from,
+    'message': msg
+  };
+  redis_client.("messages", id, entry);
+}
 
 function nth(d) {
   if(d>3 && d<21) return 'th';
