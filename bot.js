@@ -4,15 +4,17 @@ var irc = require('irc');
 var redis = require("redis"),
     redis_client = redis.createClient();
 
+var config = require('./config')
+
 if (!Date.now) {
     Date.now = function() { return new Date().getTime(); }
 
 }
-var client = new irc.Client('irc.freenode.net', 'aaa', {
-  channels: ["#sss"],
-  userName: "ccc",
-  realName: "iii",
-  nick: "iii",
+var client = new irc.Client(config.irc.network, config.irc.irc_user, {
+  channels: config.irc.channels,
+  userName: config.irc.userName,
+  realName: config.irc.realName,
+  nick: config.irc.nick,
   floodProtection: true,
 });
 
