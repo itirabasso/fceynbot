@@ -8,11 +8,11 @@ if (!Date.now) {
     Date.now = function() { return new Date().getTime(); }
 
 }
-var client = new irc.Client('irc.freenode.net', 'Furfaro', {
-  channels: ["#orga2test"],
-  userName: "Furfi",
-  realName: "Furfaro",
-  nick: "Furfaro",
+var client = new irc.Client('irc.freenode.net', 'aaa', {
+  channels: ["#sss"],
+  userName: "ccc",
+  realName: "iii",
+  nick: "iii",
   floodProtection: true,
 });
 
@@ -69,7 +69,7 @@ function storeMessage(from, msg) {
     'from': from,
     'message': msg
   };
-  redis_client.("messages", id, entry);
+  console.log(redis_client.zadd("messages", id, entry));
 }
 
 function nth(d) {
